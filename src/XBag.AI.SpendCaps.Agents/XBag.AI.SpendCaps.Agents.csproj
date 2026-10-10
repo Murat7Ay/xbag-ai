@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.AI.SpendCaps.Agents</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.AI.SpendCaps.Agents</RootNamespace>
+    <Title>XBag.AI.SpendCaps.Agents</Title>
+    <Description>Microsoft Agent Framework glue for XBag.AI.SpendCaps: AIAgentBuilder.UseSpendCaps() opens a run-level budget scope per agent run (user and tenant from the run options), so every model call of the run, its tool loop and its sub-agents share one cap. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;llm;cost;budget;spend-cap;token-budget;agents;agent-framework;aiagent;microsoft-extensions-ai</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XBag.AI.SpendCaps\XBag.AI.SpendCaps.csproj" />
+    <!-- Microsoft.Agents.AI (not only .Abstractions) for AIAgentBuilder. -->
+    <PackageReference Include="Microsoft.Agents.AI" Version="1.24.0" />
+  </ItemGroup>
+
+</Project>

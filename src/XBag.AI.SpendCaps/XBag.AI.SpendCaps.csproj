@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.AI.SpendCaps</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.AI.SpendCaps</RootNamespace>
+    <Title>XBag.AI.SpendCaps</Title>
+    <Description>Hard token and cost caps for Microsoft.Extensions.AI: an IChatClient middleware that reserves before every model call and settles with the real UsageDetails afterwards, per run, per user and per tenant, so tool loops, parallel requests and streaming cannot overshoot. Ends cleanly (exception or final assistant message) when a cap is reached. In-memory counters, your own price table. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;llm;cost;budget;spend-cap;token-budget;usage;finops;ichatclient;microsoft-extensions-ai;agent-framework</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="System.Globalization" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Microsoft.Extensions.AI (not only .Abstractions) for ChatClientBuilder; Options for the IOptions<T> entry point. -->
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.10.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.12" />
+  </ItemGroup>
+
+</Project>
