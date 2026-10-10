@@ -5,7 +5,8 @@ public sealed class RedisCheckpointStoreOptions
 {
     /// <summary>
     /// Gets or sets the prefix of every key. Default: <c>xbag:agents</c>; keys are
-    /// <c>{prefix}:checkpoints:{sessionId}:index|data|parents|seq</c> (the session id in braces, as a cluster hash tag).
+    /// <c>{prefix}:checkpoints:{sessionId}:index|data|parents|seq</c> (the session id in braces, as a cluster hash tag; <c>%</c>, <c>{</c> and <c>}</c> in the session id are
+    /// written as <c>%25</c>, <c>%7B</c> and <c>%7D</c>). The prefix must not contain '{' or '}'.
     /// </summary>
     public string KeyPrefix { get; set; } = "xbag:agents";
 

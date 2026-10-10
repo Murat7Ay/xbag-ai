@@ -14,7 +14,9 @@ namespace XBag.Agents.Stores.Redis.Workflows;
 /// Per workflow session the store keeps a sorted set of checkpoint ids scored by a commit counter, so the index always comes
 /// back in commit order (which <c>CheckpointManager</c> relies on to find the latest checkpoint), plus a hash with the
 /// checkpoint JSON (verbatim) and a hash with parent ids. A Lua script writes all of it atomically. All keys of a session share
-/// the hash tag <c>{sessionId}</c>, so the store also works on Redis Cluster.
+/// the hash tag <c>{sessionId}</c>, so the store also works on Redis Cluster. To keep that tag valid for any session id, the
+/// characters <c>%</c>, <c>{</c> and <c>}</c> in the session id are written as <c>%25</c>, <c>%7B</c> and <c>%7D</c> in the keys,
+/// and <see cref="RedisCheckpointStoreOptions.KeyPrefix"/> must not contain braces.
 /// </para>
 /// <para>
 /// With <see cref="RedisCheckpointStoreOptions.CheckpointTimeToLive"/> all keys of a session expire that long after its last
@@ -36,6 +38,8 @@ public sealed class RedisCheckpointStore : JsonCheckpointStore
         return seq
         """;
 
+    private static readonly char[] HashTagDelimiters = ['{', '}'];
+
     private readonly IConnectionMultiplexer _connection;
     private readonly int _database;
     private readonly string _keyPrefix;
@@ -44,6 +48,7 @@ public sealed class RedisCheckpointStore : JsonCheckpointStore
     /// <summary>Initializes a new instance of the <see cref="RedisCheckpointStore"/> class.</summary>
     /// <param name="connection">The Redis connection (usually the app's singleton multiplexer).</param>
     /// <param name="options">Optional settings.</param>
+    /// <exception cref="ArgumentException"><see cref="RedisCheckpointStoreOptions.KeyPrefix"/> contains '{' or '}'.</exception>
     public RedisCheckpointStore(IConnectionMultiplexer connection, RedisCheckpointStoreOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(connection);
@@ -55,6 +60,11 @@ public sealed class RedisCheckpointStore : JsonCheckpointStore
         _connection = connection;
         _database = options?.Database ?? -1;
         _keyPrefix = options?.KeyPrefix ?? "xbag:agents";
+        if (_keyPrefix.IndexOfAny(HashTagDelimiters) >= 0)
+        {
+            throw new ArgumentException("KeyPrefix must not contain '{' or '}', which Redis Cluster uses to delimit hash tags.", nameof(options));
+        }
+
         _timeToLiveMilliseconds = (long)(options?.CheckpointTimeToLive?.TotalMilliseconds ?? 0);
     }
 
@@ -109,9 +119,17 @@ public sealed class RedisCheckpointStore : JsonCheckpointStore
     private Keys GetKeys(string sessionId)
     {
         ArgumentException.ThrowIfNullOrEmpty(sessionId);
-        string root = $"{_keyPrefix}:checkpoints:{{{sessionId}}}";
+        string root = $"{_keyPrefix}:checkpoints:{{{EscapeHashTag(sessionId)}}}";
         return new Keys($"{root}:seq", $"{root}:index", $"{root}:data", $"{root}:parents");
     }
+
+    // A hash tag ends at the first '}' and must not be empty, so braces in the session id are escaped. Escaping '%' as well
+    // keeps the mapping one-to-one, so different session ids never share keys.
+    private static string EscapeHashTag(string sessionId) =>
+        sessionId
+            .Replace("%", "%25", StringComparison.Ordinal)
+            .Replace("{", "%7B", StringComparison.Ordinal)
+            .Replace("}", "%7D", StringComparison.Ordinal);
 
     private readonly record struct Keys(string Sequence, string Index, string Data, string Parents);
 }

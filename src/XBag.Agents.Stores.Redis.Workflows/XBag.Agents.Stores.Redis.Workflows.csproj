@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>XBag.Agents.Stores.Redis.Workflows</PackageId>
-    <Version>0.1.0-preview.1</Version>
+    <Version>0.1.0-preview.2</Version>
     <RootNamespace>XBag.Agents.Stores.Redis.Workflows</RootNamespace>
     <Title>XBag.Agents.Stores.Redis.Workflows</Title>
     <Description>A JsonCheckpointStore for Microsoft Agent Framework workflows on Redis (StackExchange.Redis): a sorted set per session keeps commit order, checkpoint JSON stored verbatim, atomic Lua writes, optional TTL, Redis Cluster friendly. Not affiliated with Microsoft.</Description>

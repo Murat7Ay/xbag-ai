@@ -89,6 +89,9 @@ CheckpointInfo? latest = await checkpoints.GetLatestCheckpointAsync("siparis-42"
 ```
 
 The session id is in braces (`{sessionId}`), a Redis Cluster hash tag, so one Lua script can update all four keys atomically.
+To keep the tag valid for any session id, `%`, `{` and `}` in the session id are written as `%25`, `%7B` and `%7D`, and
+`KeyPrefix` must not contain braces (since 0.1.0-preview.2; earlier versions failed on Redis Cluster for session ids
+containing braces).
 
 ## What this is not
 
