@@ -13,12 +13,11 @@
     <Authors>Murat Ay</Authors>
     <Copyright>Copyright (c) Murat Ay</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Murat7Ay/extensions-ai-testing</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Murat7Ay/extensions-ai-testing</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Murat7Ay/xbag-ai</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Murat7Ay/xbag-ai</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>ai;llm;testing;test-doubles;fake;mock;ichatclient;microsoft-extensions-ai;agent-framework;aiagent;xunit;nunit;mstest</PackageTags>
-    <Version>0.1.0-preview.1</Version>
 
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>

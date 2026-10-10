@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <PackageId>XBag.AI.Testing</PackageId>
+    <Version>0.1.0-preview.1</Version>
     <RootNamespace>XBag.AI.Testing</RootNamespace>
     <Title>XBag.AI.Testing</Title>
     <Description>Test doubles for Microsoft.Extensions.AI: a scripted, recording IChatClient (replies, tool calls, failures, usage, streaming) and framework-neutral assertions on what the model was sent. Runs under the real FunctionInvokingChatClient and Agent Framework pipelines. Not affiliated with Microsoft.</Description>

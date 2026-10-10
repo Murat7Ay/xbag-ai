@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <PackageId>XBag.AI.Testing.Agents</PackageId>
+    <Version>0.1.0-preview.1</Version>
     <RootNamespace>XBag.AI.Testing.Agents</RootNamespace>
     <Title>XBag.AI.Testing.Agents</Title>
     <Description>Test doubles for Microsoft Agent Framework: a scripted, recording FakeAIAgent (responses, streaming updates, failures) to use as the inner agent when testing AIAgent decorators and pipelines. Not affiliated with Microsoft.</Description>
