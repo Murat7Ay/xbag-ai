@@ -1,4 +1,4 @@
-namespace Extensions.AI.Testing;
+namespace XBag.AI.Testing;
 
 /// <summary>
 /// Thrown when a test double's expectation is not met: a scripted fake ran out of steps, steps were left unused,

@@ -5,13 +5,13 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions.AI.Testing", "src\Extensions.AI.Testing\Extensions.AI.Testing.csproj", "{9FD3F0D5-970C-4793-97EA-A7F220E7D740}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBag.AI.Testing", "src\XBag.AI.Testing\XBag.AI.Testing.csproj", "{9FD3F0D5-970C-4793-97EA-A7F220E7D740}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions.AI.Testing.Agents", "src\Extensions.AI.Testing.Agents\Extensions.AI.Testing.Agents.csproj", "{C4C7CB09-A156-404F-B374-1904A03D0135}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBag.AI.Testing.Agents", "src\XBag.AI.Testing.Agents\XBag.AI.Testing.Agents.csproj", "{C4C7CB09-A156-404F-B374-1904A03D0135}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensions.AI.Testing.Tests", "tests\Extensions.AI.Testing.Tests\Extensions.AI.Testing.Tests.csproj", "{E29E7141-972D-4933-9BF7-F0F0184184F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBag.AI.Testing.Tests", "tests\XBag.AI.Testing.Tests\XBag.AI.Testing.Tests.csproj", "{E29E7141-972D-4933-9BF7-F0F0184184F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

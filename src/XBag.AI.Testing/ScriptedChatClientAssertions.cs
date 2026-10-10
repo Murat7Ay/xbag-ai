@@ -1,6 +1,6 @@
-using Extensions.AI.Testing.Internal;
+using XBag.AI.Testing.Internal;
 
-namespace Extensions.AI.Testing;
+namespace XBag.AI.Testing;
 
 /// <summary>
 /// Framework-neutral assertions over the requests a <see cref="ScriptedChatClient"/> recorded.

@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.Agents.AI;
 
-namespace Extensions.AI.Testing.Agents;
+namespace XBag.AI.Testing.Agents;
 
 /// <summary>
 /// A fake <see cref="AIAgent"/> that answers with a script of steps, one step per run, and records every run.

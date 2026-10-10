@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-namespace Extensions.AI.Testing.Internal;
+namespace XBag.AI.Testing.Internal;
 
 internal static class ArgumentConverter
 {

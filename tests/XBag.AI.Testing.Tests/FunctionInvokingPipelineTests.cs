@@ -1,7 +1,7 @@
 using System.ComponentModel;
-using Extensions.AI.Testing;
+using XBag.AI.Testing;
 
-namespace Extensions.AI.Testing.Tests;
+namespace XBag.AI.Testing.Tests;
 
 /// <summary>ScriptedChatClient as the leaf under the real Microsoft.Extensions.AI FunctionInvokingChatClient.</summary>
 public sealed class FunctionInvokingPipelineTests

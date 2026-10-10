@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>Extensions.AI.Testing</PackageId>
-    <RootNamespace>Extensions.AI.Testing</RootNamespace>
-    <Title>Extensions.AI.Testing</Title>
+    <PackageId>XBag.AI.Testing</PackageId>
+    <RootNamespace>XBag.AI.Testing</RootNamespace>
+    <Title>XBag.AI.Testing</Title>
     <Description>Test doubles for Microsoft.Extensions.AI: a scripted, recording IChatClient (replies, tool calls, failures, usage, streaming) and framework-neutral assertions on what the model was sent. Runs under the real FunctionInvokingChatClient and Agent Framework pipelines. Not affiliated with Microsoft.</Description>
   </PropertyGroup>
 

@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Extensions.AI.Testing\Extensions.AI.Testing.csproj" />
-    <ProjectReference Include="..\..\src\Extensions.AI.Testing.Agents\Extensions.AI.Testing.Agents.csproj" />
+    <ProjectReference Include="..\..\src\XBag.AI.Testing\XBag.AI.Testing.csproj" />
+    <ProjectReference Include="..\..\src\XBag.AI.Testing.Agents\XBag.AI.Testing.Agents.csproj" />
   </ItemGroup>
 
   <ItemGroup>

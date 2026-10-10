@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Extensions.AI.Testing.Internal;
+using XBag.AI.Testing.Internal;
 
-namespace Extensions.AI.Testing;
+namespace XBag.AI.Testing;
 
 /// <summary>A snapshot of one call that reached a <see cref="ScriptedChatClient"/>.</summary>
 /// <remarks>

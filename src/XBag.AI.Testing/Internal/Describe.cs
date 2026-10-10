@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Extensions.AI.Testing.Internal;
+namespace XBag.AI.Testing.Internal;
 
 /// <summary>Short, human-readable renderings used in failure messages.</summary>
 internal static class Describe

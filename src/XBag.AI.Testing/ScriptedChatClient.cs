@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using Extensions.AI.Testing.Internal;
+using XBag.AI.Testing.Internal;
 
-namespace Extensions.AI.Testing;
+namespace XBag.AI.Testing;
 
 /// <summary>
 /// A fake leaf <see cref="IChatClient"/> that answers with a script of steps, one step per model call, and records every request.

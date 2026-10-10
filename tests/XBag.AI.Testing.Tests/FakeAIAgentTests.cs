@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Extensions.AI.Testing;
-using Extensions.AI.Testing.Agents;
+using XBag.AI.Testing;
+using XBag.AI.Testing.Agents;
 using Microsoft.Agents.AI;
 
-namespace Extensions.AI.Testing.Tests;
+namespace XBag.AI.Testing.Tests;
 
 public sealed class FakeAIAgentTests
 {

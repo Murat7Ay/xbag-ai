@@ -1,6 +1,6 @@
 using Microsoft.Agents.AI;
 
-namespace Extensions.AI.Testing.Agents;
+namespace XBag.AI.Testing.Agents;
 
 /// <summary>The session type created by <see cref="FakeAIAgent"/>. State lives in <see cref="AgentSession.StateBag"/>.</summary>
 public sealed class FakeAgentSession : AgentSession

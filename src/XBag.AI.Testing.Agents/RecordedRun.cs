@@ -1,6 +1,6 @@
 using Microsoft.Agents.AI;
 
-namespace Extensions.AI.Testing.Agents;
+namespace XBag.AI.Testing.Agents;
 
 /// <summary>A snapshot of one run that reached a <see cref="FakeAIAgent"/>.</summary>
 /// <remarks>

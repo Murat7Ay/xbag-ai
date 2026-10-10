@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using Extensions.AI.Testing.Internal;
+using XBag.AI.Testing.Internal;
 
-namespace Extensions.AI.Testing;
+namespace XBag.AI.Testing;
 
 /// <summary>A tool call that a <see cref="ScriptedChatClient"/> step makes the model request.</summary>
 public sealed class ToolCall

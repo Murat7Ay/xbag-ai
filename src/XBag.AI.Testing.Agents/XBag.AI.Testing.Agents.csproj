@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>Extensions.AI.Testing.Agents</PackageId>
-    <RootNamespace>Extensions.AI.Testing.Agents</RootNamespace>
-    <Title>Extensions.AI.Testing.Agents</Title>
+    <PackageId>XBag.AI.Testing.Agents</PackageId>
+    <RootNamespace>XBag.AI.Testing.Agents</RootNamespace>
+    <Title>XBag.AI.Testing.Agents</Title>
     <Description>Test doubles for Microsoft Agent Framework: a scripted, recording FakeAIAgent (responses, streaming updates, failures) to use as the inner agent when testing AIAgent decorators and pipelines. Not affiliated with Microsoft.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Extensions.AI.Testing\Extensions.AI.Testing.csproj" />
+    <ProjectReference Include="..\XBag.AI.Testing\XBag.AI.Testing.csproj" />
     <PackageReference Include="Microsoft.Agents.AI.Abstractions" Version="1.24.0" />
   </ItemGroup>
 

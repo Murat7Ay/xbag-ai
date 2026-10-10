@@ -1,6 +1,6 @@
-using Extensions.AI.Testing;
+using XBag.AI.Testing;
 
-namespace Extensions.AI.Testing.Tests;
+namespace XBag.AI.Testing.Tests;
 
 public sealed class ScriptedChatClientTests
 {

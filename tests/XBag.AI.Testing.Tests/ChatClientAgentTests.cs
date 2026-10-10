@@ -1,8 +1,8 @@
 using System.ComponentModel;
-using Extensions.AI.Testing;
+using XBag.AI.Testing;
 using Microsoft.Agents.AI;
 
-namespace Extensions.AI.Testing.Tests;
+namespace XBag.AI.Testing.Tests;
 
 /// <summary>ScriptedChatClient under the real Agent Framework ChatClientAgent (which adds its own FunctionInvokingChatClient).</summary>
 public sealed class ChatClientAgentTests

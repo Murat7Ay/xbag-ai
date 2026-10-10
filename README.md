@@ -1,7 +1,7 @@
-# Extensions.AI.Testing
+# XBag.AI.Testing
 
 [![CI](https://github.com/Murat7Ay/extensions-ai-testing/actions/workflows/ci.yml/badge.svg)](https://github.com/Murat7Ay/extensions-ai-testing/actions/workflows/ci.yml)
-[![NuGet](https://img.shields.io/nuget/vpre/Extensions.AI.Testing.svg)](https://www.nuget.org/packages/Extensions.AI.Testing)
+[![NuGet](https://img.shields.io/nuget/vpre/XBag.AI.Testing.svg)](https://www.nuget.org/packages/XBag.AI.Testing)
 [![.NET 8 | 10](https://img.shields.io/badge/.NET-8%20%7C%2010-512BD4)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -10,12 +10,13 @@ Test doubles for [Microsoft.Extensions.AI](https://learn.microsoft.com/dotnet/ai
 scripted, recording `AIAgent`. Test your tools, middleware and agents in milliseconds, with no API key, against the
 **real** `FunctionInvokingChatClient` and `ChatClientAgent`.
 
-> Community package, not affiliated with Microsoft.
+> Part of the **XBag** family of .NET packages by Murat Ay, the author of XBag, a .NET process-orchestration and
+> decisioning platform. Community package, not affiliated with Microsoft.
 
 | Package | Depends on | Contains |
 |---|---|---|
-| `Extensions.AI.Testing` | `Microsoft.Extensions.AI.Abstractions` 10.10.1 | `ScriptedChatClient`, `RecordedRequest`, `ToolCall`, assertions, `AIAssertionException` |
-| `Extensions.AI.Testing.Agents` | the above + `Microsoft.Agents.AI.Abstractions` 1.24.0 | `FakeAIAgent`, `FakeAgentSession`, `RecordedRun` |
+| `XBag.AI.Testing` | `Microsoft.Extensions.AI.Abstractions` 10.10.1 | `ScriptedChatClient`, `RecordedRequest`, `ToolCall`, assertions, `AIAssertionException` |
+| `XBag.AI.Testing.Agents` | the above + `Microsoft.Agents.AI.Abstractions` 1.24.0 | `FakeAIAgent`, `FakeAgentSession`, `RecordedRun` |
 
 ```
 Pipeline slot
@@ -28,8 +29,8 @@ Pipeline slot
 ## Install
 
 ```bash
-dotnet add package Extensions.AI.Testing --prerelease
-dotnet add package Extensions.AI.Testing.Agents --prerelease   # only if you test AIAgent decorators
+dotnet add package XBag.AI.Testing --prerelease
+dotnet add package XBag.AI.Testing.Agents --prerelease   # only if you test AIAgent decorators
 ```
 
 ## Example
@@ -113,7 +114,7 @@ back to the model, i.e. the pipeline really executed it.
 | `ShouldHaveSentSystemPrompt(text, requestIndex?)` | instructions or a system message contained `text` |
 | `GetExecutedToolCalls()` | the executed calls, for your own assertions |
 
-## `FakeAIAgent` (package `Extensions.AI.Testing.Agents`)
+## `FakeAIAgent` (package `XBag.AI.Testing.Agents`)
 
 A scripted `AIAgent` for testing what wraps an agent: `DelegatingAIAgent` decorators, `AIAgentBuilder.Use(...)`
 middleware, workflow glue.

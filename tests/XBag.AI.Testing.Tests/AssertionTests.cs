@@ -1,6 +1,6 @@
-using Extensions.AI.Testing;
+using XBag.AI.Testing;
 
-namespace Extensions.AI.Testing.Tests;
+namespace XBag.AI.Testing.Tests;
 
 /// <summary>The failure messages are part of the API: they must say what was expected and what happened.</summary>
 public sealed class AssertionTests
