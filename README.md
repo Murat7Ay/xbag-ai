@@ -15,7 +15,7 @@ extension point and is useful on its own. Community packages, not affiliated wit
 |---|---|---|
 | [`XBag.AI.Testing`](src/XBag.AI.Testing) | Scripted, recording `IChatClient` and assertions: test tools, middleware and agents with no API key | 0.1.0-preview.1 |
 | [`XBag.AI.Testing.Agents`](src/XBag.AI.Testing.Agents) | Scripted, recording `AIAgent` for testing agent decorators and pipelines | 0.1.0-preview.1 |
-| `XBag.Agents.Stores.EntityFrameworkCore` | Durable chat history and workflow checkpoints in SQL Server, PostgreSQL and SQLite | planned |
+| [`XBag.Agents.Stores.EntityFrameworkCore`](src/XBag.Agents.Stores.EntityFrameworkCore) | Durable chat history and workflow checkpoints in SQL Server, PostgreSQL and SQLite | 0.1.0-preview.1 |
 | `XBag.AI.SpendCaps` | Token and cost caps per run, user and tenant | planned |
 | `XBag.AI.ToolGuard` | Tool-argument validation with corrective feedback, result caps | planned |
 | `XBag.AI.Adaptive` | Option and structured-output adaptation across models (Qwen, vLLM, OpenAI-compatible endpoints) | planned |
