@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.Agents.Stores.EntityFrameworkCore.Workflows</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.Agents.Stores.EntityFrameworkCore.Workflows</RootNamespace>
+    <Title>XBag.Agents.Stores.EntityFrameworkCore.Workflows</Title>
+    <Description>A JsonCheckpointStore for Microsoft Agent Framework workflows on Entity Framework Core: checkpoints in SQL Server, PostgreSQL, SQLite or any relational EF Core provider, JSON kept verbatim as text, index in commit order, resumable from any instance. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;agents;agent-framework;workflows;checkpoint;jsoncheckpointstore;entity-framework-core;efcore;sql-server;postgresql;sqlite;persistence</PackageTags>
+    <!-- EF Core itself is not trimming- or AOT-safe, so this package does not claim to be. -->
+    <IsAotCompatible>false</IsAotCompatible>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\EntityFrameworkCore\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.24.0" />
+  </ItemGroup>
+
+  <!-- EF Core 10 requires .NET 10; .NET 8 apps get EF Core 8. -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.31" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.12" />
+  </ItemGroup>
+
+</Project>

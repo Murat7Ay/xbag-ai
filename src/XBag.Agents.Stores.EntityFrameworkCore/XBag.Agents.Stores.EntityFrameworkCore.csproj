@@ -5,15 +5,21 @@
     <Version>0.1.0-preview.1</Version>
     <RootNamespace>XBag.Agents.Stores.EntityFrameworkCore</RootNamespace>
     <Title>XBag.Agents.Stores.EntityFrameworkCore</Title>
-    <Description>Durable stores for Microsoft Agent Framework on Entity Framework Core: a ChatHistoryProvider that keeps each session's chat history and a JsonCheckpointStore for workflow checkpoints, in SQL Server, PostgreSQL, SQLite or any relational EF Core provider. Ordered by a per-conversation sequence, JSON kept as text. Not affiliated with Microsoft.</Description>
-    <PackageTags>ai;agents;agent-framework;chat-history;chathistoryprovider;checkpoint;workflows;entity-framework-core;efcore;sql-server;postgresql;sqlite;persistence</PackageTags>
+    <Description>Durable stores for Microsoft Agent Framework on Entity Framework Core: a ChatHistoryProvider that keeps each session's chat history and an AgentSessionStore for hosted agents, in SQL Server, PostgreSQL, SQLite or any relational EF Core provider. Ordered by a per-conversation sequence, JSON kept as text, tenant partitions honoured. Workflow checkpoints: XBag.Agents.Stores.EntityFrameworkCore.Workflows. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;agents;agent-framework;chat-history;chathistoryprovider;agentsessionstore;sessions;entity-framework-core;efcore;sql-server;postgresql;sqlite;persistence</PackageTags>
     <!-- EF Core itself is not trimming- or AOT-safe, so this package does not claim to be. -->
     <IsAotCompatible>false</IsAotCompatible>
+    <!-- MAAI001: AgentSessionStore / AgentSessionStoreKey are [Experimental] in Microsoft.Agents.AI.Abstractions. -->
+    <NoWarn>$(NoWarn);MAAI001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\Shared\Stores\*.cs" LinkBase="Shared" />
+    <Compile Include="..\Shared\EntityFrameworkCore\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Agents.AI.Abstractions" Version="1.24.0" />
-    <PackageReference Include="Microsoft.Agents.AI.Workflows" Version="1.24.0" />
   </ItemGroup>
 
   <!-- EF Core 10 requires .NET 10; .NET 8 apps get EF Core 8. -->

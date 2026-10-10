@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <!-- MAAI001: AgentSessionStore and ChatHistoryProvider.InvokedContext's constructor are [Experimental]. -->
+    <NoWarn>$(NoWarn);MAAI001</NoWarn>
+    <!-- The packages are built against StackExchange.Redis 2.13 (floor). Tests run on the current 3.x line by default;
+         CI also runs them with -p:TestRedisClientVersion=2.13.17. -->
+    <TestRedisClientVersion Condition="'$(TestRedisClientVersion)' == ''">3.4.0</TestRedisClientVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />
+    <!-- The real Microsoft pipeline the stores are proven against. -->
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.10.0" />
+    <PackageReference Include="Microsoft.Agents.AI" Version="1.24.0" />
+    <!-- A real Redis in Docker; CI (ubuntu-latest) has Docker. -->
+    <PackageReference Include="Testcontainers.Redis" Version="4.15.0" />
+    <PackageReference Include="StackExchange.Redis" Version="$(TestRedisClientVersion)" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\XBag.Agents.Stores.Redis\XBag.Agents.Stores.Redis.csproj" />
+    <ProjectReference Include="..\..\src\XBag.Agents.Stores.Redis.Workflows\XBag.Agents.Stores.Redis.Workflows.csproj" />
+    <ProjectReference Include="..\..\src\XBag.AI.Testing\XBag.AI.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Contract tests shared with the EF Core stores. -->
+    <Compile Include="..\Shared\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Microsoft.Extensions.AI" />
+  </ItemGroup>
+
+</Project>

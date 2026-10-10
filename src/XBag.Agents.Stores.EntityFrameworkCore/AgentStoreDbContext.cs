@@ -16,7 +16,7 @@ public class AgentStoreDbContext : DbContext
     {
     }
 
-    /// <summary>Initializes a new instance for a derived context type.</summary>
+    /// <summary>Initializes a new instance for a derived context type (for example one that also maps workflow checkpoints).</summary>
     /// <param name="options">The options of the derived context.</param>
     protected AgentStoreDbContext(DbContextOptions options)
         : base(options)
@@ -26,8 +26,8 @@ public class AgentStoreDbContext : DbContext
     /// <summary>Gets the persisted chat messages, for your own queries (transcripts, audit, analytics).</summary>
     public DbSet<StoredChatMessage> ChatMessages => Set<StoredChatMessage>();
 
-    /// <summary>Gets the persisted workflow checkpoints.</summary>
-    public DbSet<StoredCheckpoint> Checkpoints => Set<StoredCheckpoint>();
+    /// <summary>Gets the persisted agent sessions.</summary>
+    public DbSet<StoredAgentSession> Sessions => Set<StoredAgentSession>();
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.Agents.Stores.Redis</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.Agents.Stores.Redis</RootNamespace>
+    <Title>XBag.Agents.Stores.Redis</Title>
+    <Description>Redis stores for Microsoft Agent Framework on StackExchange.Redis: a ChatHistoryProvider (one list per conversation, atomic appends, optional TTL) and an AgentSessionStore for hosted agents (optional TTL, tenant partitions honoured). Workflow checkpoints: XBag.Agents.Stores.Redis.Workflows. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;agents;agent-framework;chat-history;chathistoryprovider;agentsessionstore;sessions;redis;stackexchange-redis;persistence;cache</PackageTags>
+    <!-- MAAI001: AgentSessionStore / AgentSessionStoreKey are [Experimental] in Microsoft.Agents.AI.Abstractions. -->
+    <NoWarn>$(NoWarn);MAAI001</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\Shared\Stores\*.cs" LinkBase="Shared" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Agents.AI.Abstractions" Version="1.24.0" />
+    <!-- Floor: the last 2.x line, so 2.x and 3.x apps can both use the package (tests run on 3.x). -->
+    <PackageReference Include="StackExchange.Redis" Version="2.13.17" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
+  </ItemGroup>
+
+</Project>

@@ -6,9 +6,15 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Murat7Ay/xbag-ai/blob/main/LICENSE)
 
 Durable stores for [Microsoft Agent Framework](https://learn.microsoft.com/agent-framework/) on Entity Framework Core:
-a `ChatHistoryProvider` that keeps every agent session's conversation, and a `JsonCheckpointStore` for workflow
-checkpoints, in the **SQL Server, PostgreSQL or SQLite** database you already run. Conversations and workflows survive
-restarts and can continue on another instance.
+a `ChatHistoryProvider` that keeps every agent session's conversation, and an `AgentSessionStore` for hosted agents, in
+the **SQL Server, PostgreSQL or SQLite** database you already run. Conversations survive restarts and continue on any
+instance.
+
+| Package | Contains |
+|---|---|
+| `XBag.Agents.Stores.EntityFrameworkCore` (this one) | `EfChatHistoryProvider`, `EfAgentSessionStore`, `MapAgentStores`, `AddAgentStores` |
+| [`XBag.Agents.Stores.EntityFrameworkCore.Workflows`](https://github.com/Murat7Ay/xbag-ai/tree/main/src/XBag.Agents.Stores.EntityFrameworkCore.Workflows) | `EfCheckpointStore` for workflow checkpoints (brings `Microsoft.Agents.AI.Workflows`) |
+| [`XBag.Agents.Stores.Redis`](https://github.com/Murat7Ay/xbag-ai/tree/main/src/XBag.Agents.Stores.Redis) | the same two stores on Redis |
 
 > Part of the **XBag** family of .NET packages by Murat Ay, the author of XBag, a .NET process-orchestration and
 > decisioning platform. Community package, not affiliated with Microsoft.
@@ -18,8 +24,8 @@ Pipeline slot
   EfChatHistoryProvider: ChatClientAgentOptions.ChatHistoryProvider, i.e. INSIDE ChatClientAgent, above the chat-client
                          pipeline. Once per agent run: loads the session's history before the first model call, and after
                          a successful run appends the run's request and response messages (tool calls and results included).
-  EfCheckpointStore:     behind CheckpointManager.CreateJson(store), handed to InProcessExecution.RunStreamingAsync /
-                         ResumeStreamingAsync. One row per checkpoint (one per super step).
+  EfAgentSessionStore:   OUTSIDE the agent, in the host: Agent Framework hosting's WithSessionStore(store), or your own
+                         request code. One read before a request, one write after it.
 ```
 
 ## Install
@@ -80,8 +86,11 @@ Add the tables to your own context (or use the ready-made `AgentStoreDbContext`)
 ```csharp
 public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
         modelBuilder.MapAgentStores(o => o.Schema = "agents");   // then: dotnet ef migrations add AgentStores
+        modelBuilder.MapAgentCheckpoints(o => o.Schema = "agents");   // only with the .Workflows package
+    }
 }
 ```
 
@@ -89,7 +98,7 @@ Register the context factory and the stores, and give the provider to your agent
 
 ```csharp
 builder.Services.AddDbContextFactory<AppDbContext>(o => o.UseNpgsql(connectionString));
-builder.Services.AddAgentStores<AppDbContext>();
+builder.Services.AddAgentStores<AppDbContext>(o => o.Sessions.AgentNamespace = "support");
 
 builder.Services.AddSingleton<AIAgent>(sp => sp.GetRequiredService<IChatClient>().AsAIAgent(new ChatClientAgentOptions
 {
@@ -98,20 +107,22 @@ builder.Services.AddSingleton<AIAgent>(sp => sp.GetRequiredService<IChatClient>(
 }));
 ```
 
-Between requests keep the session JSON (`agent.SerializeSessionAsync(session)`, a few bytes: the conversation id) wherever
-you keep per-user state, and restore it with `agent.DeserializeSessionAsync(json)`.
-
-Workflows (the test [`CheckpointStoreTests.cs`](https://github.com/Murat7Ay/xbag-ai/blob/main/tests/XBag.Agents.Stores.EntityFrameworkCore.Tests/CheckpointStoreTests.cs)
-runs a workflow, then resumes it from a stored checkpoint with a new store and workflow instance):
+Between requests, either keep the session JSON yourself (`agent.SerializeSessionAsync(session)`: a few bytes, the
+conversation id) or let the session store keep it:
 
 ```csharp
-CheckpointManager checkpoints = CheckpointManager.CreateJson(app.Services.GetRequiredService<EfCheckpointStore<AppDbContext>>());
-await using StreamingRun run = await InProcessExecution.RunStreamingAsync(workflow, input, checkpoints, "siparis-42");
+#pragma warning disable MAAI001 // AgentSessionStore is [Experimental] in Agent Framework
+var sessions = app.Services.GetRequiredService<EfAgentSessionStore<AppDbContext>>();
+var key = new AgentSessionStoreKey("sohbet-42").WithPartition("isolation", "tenant-ankara");
 
-// later, in any process that shares the database:
-CheckpointInfo? latest = await checkpoints.GetLatestCheckpointAsync("siparis-42");
-await using StreamingRun resumed = await InProcessExecution.ResumeStreamingAsync(workflow, latest!, checkpoints);
+AgentSession session = await sessions.GetOrCreateSessionAsync(agent, key);
+await agent.RunAsync("İzmir'de hava nasıl?", session);
+await sessions.SaveSessionAsync(agent, key, session);
 ```
+
+With Agent Framework hosting (AG-UI, OpenAI Responses, A2A), pass the same store to `WithSessionStore(...)`. Its
+isolation layer adds an `isolation` partition per tenant or user; this store keeps those sessions apart and also writes the
+value to its own `isolation_key` column.
 
 ## API
 
@@ -122,47 +133,55 @@ await using StreamingRun resumed = await InProcessExecution.ResumeStreamingAsync
 | `.GetMessagesAsync(session)` | The stored history, oldest first (for a UI, an export, a test) |
 | `.ClearAsync(session)` | Deletes the session's rows, returns the count; the session keeps its id |
 | `EfChatHistoryProviderOptions` | `ConversationIdFactory` (use your own chat ids; default a GUID), `StateKey` (default `XBag.EfChatHistoryProvider`), `JsonSerializerOptions` |
-| `EfCheckpointStore<TContext> : JsonCheckpointStore` | The workflow checkpoint store. `new(IDbContextFactory<TContext>)`; use with `CheckpointManager.CreateJson(store)` |
-| `modelBuilder.MapAgentStores(o => ...)` | Maps both tables into your context. `AgentStoreModelOptions`: `Schema`, `ChatMessagesTable`, `CheckpointsTable` |
-| `AgentStoreDbContext` | A ready-made context with only these tables; `ChatMessages` and `Checkpoints` sets for your queries |
-| `StoredChatMessage`, `StoredCheckpoint` | The row types: query transcripts with LINQ or SQL |
-| `services.AddAgentStores<TContext>(o => ...)` | Registers both stores as singletons; needs `AddDbContextFactory<TContext>` |
+| `EfAgentSessionStore<TContext> : AgentSessionStore` | **`[Experimental("MAAI001")]`** session store. `new(IDbContextFactory<TContext>, EfAgentSessionStoreOptions?)`; `SaveSessionAsync`, `GetSessionAsync`, `GetOrCreateSessionAsync`, plus `DeleteSessionAsync` |
+| `EfAgentSessionStoreOptions` | `AgentNamespace` (default: the agent's `Name`), `JsonSerializerOptions` |
+| `modelBuilder.MapAgentStores(o => ...)` | Maps both tables into your context. `AgentStoreModelOptions`: `Schema`, `ChatMessagesTable`, `SessionsTable` |
+| `AgentStoreDbContext` | A ready-made context with only these tables; `ChatMessages` and `Sessions` sets for your queries |
+| `StoredChatMessage`, `StoredAgentSession` | The row types: query transcripts and sessions with LINQ or SQL |
+| `services.AddAgentStores<TContext>(o => ...)` | Registers both stores as singletons (`o.ChatHistory`, `o.Sessions`); needs `AddDbContextFactory<TContext>` |
 
 ### Schema
 
 ```
-agent_chat_messages         PK (conversation_id, sequence)   role, created_at, payload
-agent_workflow_checkpoints  PK (session_id, checkpoint_id)   UNIQUE (session_id, sequence), parent_checkpoint_id, created_at, payload
+agent_chat_messages  PK (conversation_id, sequence)     role, created_at, payload
+agent_sessions       PK (agent_namespace, session_key)  session_id, isolation_key (indexed), partitions, updated_at, payload
 ```
 
-`payload` is the serialized `ChatMessage` / checkpoint as **text** (`nvarchar(max)` on SQL Server, `text` on PostgreSQL,
-`TEXT` on SQLite). Ids are at most 200 characters.
+`session_key` is a SHA-256 of the session id and every partition, so any number of partitions fits the key; `session_id`,
+`isolation_key` and `partitions` (JSON) repeat it readably, so "all sessions of tenant X" is one SQL query. `payload` is
+the serialized `ChatMessage` / session as **text** (`nvarchar(max)` on SQL Server, `text` on PostgreSQL, `TEXT` on SQLite).
+Ids are at most 200 characters.
 
 ### The pitfalls it handles
 
-- **Order by sequence, not time.** Rows carry a per-conversation (per-session) sequence number that is part of a unique key.
-  Timestamps are informational only, so two messages or checkpoints in the same second never swap places, and the checkpoint
-  index comes back in commit order, which `CheckpointManager` relies on to pick the latest checkpoint.
-- **Concurrent writers.** If two instances append to the same conversation at the same moment, one insert hits the unique key
-  and that writer re-reads the end of the sequence and retries (proven by a test that forces the collision).
+- **Order by sequence, not time.** Messages carry a per-conversation sequence number that is part of the primary key.
+  Timestamps are informational only, so two messages stored in the same second never swap places.
+- **Concurrent writers.** If two instances append to the same conversation at the same moment, one insert hits the key and
+  that writer re-reads the end of the sequence and retries (proven by a test that forces the collision).
 - **JSON as text, never `jsonb`.** PostgreSQL `jsonb` reorders properties and breaks System.Text.Json's `$type`-first
-  polymorphism on checkpoint resume; this store returns the JSON byte-for-byte.
-- **Per-session state lives in the session.** The provider keeps nothing session-specific in fields (the conversation id is in
-  `AgentSession.StateBag`), so one singleton serves every session.
-- **Short-lived contexts.** Every operation creates and disposes its own `DbContext` through `IDbContextFactory<TContext>`.
-- **Failed runs store nothing**, as the `ChatHistoryProvider` contract defines.
+  polymorphism; this store returns the JSON byte-for-byte.
+- **Partitions are identity.** A session saved for tenant Ankara is invisible to tenant İzmir, whatever the order of the
+  partitions in the key. Every lookup returns a new, independent session, as the contract requires.
+- **Agents are not mixed up.** Sessions are kept per agent namespace (default the agent's `Name`, never its random `Id`,
+  which would lose every session after a restart).
+- **Per-session state lives in the session**, short-lived contexts per operation, and **failed runs store nothing**.
 
 ## What this is not
 
-- **Not an `AgentSessionStore`.** The session JSON itself is yours to keep (it is tiny). Microsoft's `AgentSessionStore` is
-  `[Experimental("MAAI001")]` and its contract already changed once (1.22); an EF implementation is on the
-  [roadmap](https://github.com/Murat7Ay/xbag-ai/blob/main/src/XBag.Agents.Stores.EntityFrameworkCore/ROADMAP.md).
 - **Not long-term or vector memory.** This is the transcript of a conversation, not retrieval over many of them.
-- **Not a retention policy.** Rows stay until you delete them (`ClearAsync`, or your own SQL); there is no TTL and no
-  encryption beyond what your database provides. Transcripts contain personal data: protect the database.
+- **Not a retention policy.** Rows stay until you delete them (`ClearAsync`, `DeleteSessionAsync`, or your own SQL); there
+  is no TTL and no encryption beyond what your database provides. Transcripts contain personal data: protect the database.
 - **No history trimming yet.** The whole conversation is loaded on every run.
-- **Not a distributed workflow runtime.** Any instance can resume a checkpoint; deciding which one does is up to you.
-- **Not Redis.** A Redis package is on the roadmap.
+- **No concurrency control for sessions.** If two instances save the same session, the last write wins (row version or a
+  lease is on the [roadmap](https://github.com/Murat7Ay/xbag-ai/blob/main/src/XBag.Agents.Stores.EntityFrameworkCore/ROADMAP.md)).
+
+## Built on an experimental Microsoft API
+
+`EfAgentSessionStore` implements Agent Framework's `AgentSessionStore`, which is `[Experimental("MAAI001")]` in
+`Microsoft.Agents.AI.Abstractions` (a stable package) and already changed once (1.22 introduced `AgentSessionStoreKey`
+and removed `DeleteSessionAsync`). The class carries the same `MAAI001` diagnostic, so you opt in exactly as you do for
+Microsoft's type, and it may change in a minor release of this package when Microsoft changes the contract. The chat
+history provider builds only on stable APIs.
 
 ## If Microsoft ships a relational store
 
@@ -177,9 +196,9 @@ cover. If Microsoft publishes its planned conformance suite for store implemente
 
 ## Versions
 
-Depends on `Microsoft.Agents.AI.Abstractions` 1.24.0 and `Microsoft.Agents.AI.Workflows` 1.24.0 (which brings
-`Microsoft.Agents.AI`), and `Microsoft.EntityFrameworkCore.Relational` 8.0.31 (.NET 8) / 10.0.12 (.NET 10). Tested on .NET 8
-and .NET 10 with SQLite; the generated SQL Server and PostgreSQL schema was checked, but CI does not run those databases yet.
+Depends only on `Microsoft.Agents.AI.Abstractions` 1.24.0 and `Microsoft.EntityFrameworkCore.Relational` 8.0.31 (.NET 8) /
+10.0.12 (.NET 10). Not trimming/NativeAOT compatible, because EF Core is not. Tested on .NET 8 and .NET 10 with SQLite;
+the generated SQL Server and PostgreSQL schema was checked, but CI does not run those databases yet.
 Status: `0.1.0-preview.1`, the API and schema may change before 1.0.
 
 ## License

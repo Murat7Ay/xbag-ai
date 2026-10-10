@@ -4,7 +4,7 @@
     <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <!-- MAAI001: ChatHistoryProvider.InvokedContext's constructor is [Experimental]; one test drives the provider directly. -->
+    <!-- MAAI001: AgentSessionStore and ChatHistoryProvider.InvokedContext's constructor are [Experimental]. -->
     <NoWarn>$(NoWarn);MAAI001</NoWarn>
   </PropertyGroup>
 
@@ -27,7 +27,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\XBag.Agents.Stores.EntityFrameworkCore\XBag.Agents.Stores.EntityFrameworkCore.csproj" />
+    <ProjectReference Include="..\..\src\XBag.Agents.Stores.EntityFrameworkCore.Workflows\XBag.Agents.Stores.EntityFrameworkCore.Workflows.csproj" />
     <ProjectReference Include="..\..\src\XBag.AI.Testing\XBag.AI.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Contract tests shared with the Redis stores. -->
+    <Compile Include="..\Shared\*.cs" LinkBase="Shared" />
   </ItemGroup>
 
   <ItemGroup>

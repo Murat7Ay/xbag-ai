@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace XBag.Agents.Stores.EntityFrameworkCore.Internal;
+namespace XBag.Agents.Stores.Internal;
 
 /// <summary>
 /// Appends rows after the current maximum sequence number of a conversation or session. The sequence is part of a unique key,

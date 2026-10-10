@@ -1,4 +1,4 @@
-namespace XBag.Agents.Stores.EntityFrameworkCore;
+namespace XBag.Agents.Stores.EntityFrameworkCore.Workflows;
 
 /// <summary>
 /// One persisted workflow checkpoint, a row of the checkpoint table (default <c>agent_workflow_checkpoints</c>).

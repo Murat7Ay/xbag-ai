@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.Agents.AI;
 using Microsoft.EntityFrameworkCore;
-using XBag.Agents.Stores.EntityFrameworkCore.Internal;
+using XBag.Agents.Stores.Internal;
 
 namespace XBag.Agents.Stores.EntityFrameworkCore;
 
@@ -36,7 +36,7 @@ public sealed class EfChatHistoryProvider<TContext> : ChatHistoryProvider
     public const string DefaultStateKey = "XBag.EfChatHistoryProvider";
 
     private readonly IDbContextFactory<TContext> _contextFactory;
-    private readonly ProviderSessionState<ChatHistorySessionState> _sessionState;
+    private readonly ConversationState _conversations;
     private readonly JsonTypeInfo _messageTypeInfo;
     private IReadOnlyList<string>? _stateKeys;
 
@@ -50,16 +50,12 @@ public sealed class EfChatHistoryProvider<TContext> : ChatHistoryProvider
         _contextFactory = contextFactory;
         JsonSerializerOptions jsonOptions = StoreJson.CreateOptions(options?.JsonSerializerOptions);
         _messageTypeInfo = jsonOptions.GetTypeInfo(typeof(ChatMessage));
-
-        Func<AgentSession?, string> newConversationId = options?.ConversationIdFactory ?? (_ => Guid.NewGuid().ToString("N"));
-        _sessionState = new ProviderSessionState<ChatHistorySessionState>(
-            session => new ChatHistorySessionState { ConversationId = ValidateConversationId(newConversationId(session)) },
-            options?.StateKey ?? DefaultStateKey,
-            jsonOptions);
+        _conversations = new ConversationState(
+            options?.ConversationIdFactory, options?.StateKey ?? DefaultStateKey, jsonOptions, AgentStoreModelBuilderExtensions.IdMaxLength);
     }
 
     /// <inheritdoc />
-    public override IReadOnlyList<string> StateKeys => _stateKeys ??= [_sessionState.StateKey];
+    public override IReadOnlyList<string> StateKeys => _stateKeys ??= [_conversations.StateKey];
 
     /// <summary>
     /// Gets the conversation id of <paramref name="session"/>, assigning one if the session has not been used yet.
@@ -70,7 +66,7 @@ public sealed class EfChatHistoryProvider<TContext> : ChatHistoryProvider
     public string GetConversationId(AgentSession session)
     {
         ArgumentNullException.ThrowIfNull(session);
-        return _sessionState.GetOrInitializeState(session).ConversationId;
+        return _conversations.GetConversationId(session);
     }
 
     /// <summary>Reads the stored history of <paramref name="session"/>, oldest message first.</summary>
@@ -108,7 +104,7 @@ public sealed class EfChatHistoryProvider<TContext> : ChatHistoryProvider
             return [];
         }
 
-        return await LoadAsync(_sessionState.GetOrInitializeState(context.Session).ConversationId, cancellationToken).ConfigureAwait(false);
+        return await LoadAsync(_conversations.GetConversationId(context.Session), cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -119,7 +115,7 @@ public sealed class EfChatHistoryProvider<TContext> : ChatHistoryProvider
             return; // Nothing could ever load these rows again.
         }
 
-        string conversationId = _sessionState.GetOrInitializeState(context.Session).ConversationId;
+        string conversationId = _conversations.GetConversationId(context.Session);
         var rows = context.RequestMessages
             .Concat(context.ResponseMessages ?? [])
             .Select(message => (Role: message.Role.Value, Payload: JsonSerializer.Serialize(message, _messageTypeInfo)))
@@ -183,16 +179,5 @@ public sealed class EfChatHistoryProvider<TContext> : ChatHistoryProvider
 
             return messages;
         }
-    }
-
-    private static string ValidateConversationId(string conversationId)
-    {
-        if (string.IsNullOrWhiteSpace(conversationId) || conversationId.Length > AgentStoreModelBuilderExtensions.IdMaxLength)
-        {
-            throw new InvalidOperationException(
-                $"{nameof(EfChatHistoryProviderOptions.ConversationIdFactory)} must return a non-empty id of at most {AgentStoreModelBuilderExtensions.IdMaxLength} characters.");
-        }
-
-        return conversationId;
     }
 }

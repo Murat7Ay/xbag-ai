@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Text.Json;
 using Microsoft.Agents.AI;
 using Microsoft.Data.Sqlite;
@@ -7,12 +6,28 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using XBag.AI.Testing;
 using XBag.Agents.Stores.EntityFrameworkCore;
+using XBag.Agents.Stores.Tests;
 
 namespace XBag.Agents.Stores.EntityFrameworkCore.Tests;
 
-/// <summary>EfChatHistoryProvider under the real Agent Framework ChatClientAgent, with ScriptedChatClient as the model.</summary>
-public sealed class ChatHistoryProviderTests
+/// <summary>
+/// EfChatHistoryProvider under the real Agent Framework ChatClientAgent, with ScriptedChatClient as the model:
+/// the shared chat history contract on SQLite, plus EF-specific checks.
+/// </summary>
+public sealed class ChatHistoryProviderTests : ChatHistoryStoreContract, IDisposable
 {
+    private readonly TestDatabase _db = new();
+
+    public void Dispose() => _db.Dispose();
+
+    protected override ChatHistoryProvider CreateProvider() => new EfChatHistoryProvider<AgentStoreDbContext>(_db.CreateFactory());
+
+    protected override Task<IReadOnlyList<ChatMessage>> GetMessagesAsync(ChatHistoryProvider provider, AgentSession session) =>
+        ((EfChatHistoryProvider<AgentStoreDbContext>)provider).GetMessagesAsync(session);
+
+    protected override Task<int> ClearAsync(ChatHistoryProvider provider, AgentSession session) =>
+        ((EfChatHistoryProvider<AgentStoreDbContext>)provider).ClearAsync(session);
+
     [Fact]
     public async Task Conversation_survives_a_restart()
     {
@@ -46,105 +61,6 @@ public sealed class ChatHistoryProviderTests
     }
 
     [Fact]
-    public async Task Tool_calls_and_tool_results_round_trip()
-    {
-        using var db = new TestDatabase();
-        AIFunction weather = AIFunctionFactory.Create(([Description("City")] string city) => $"{city}: 27C, güneşli", "get_weather");
-
-        var model1 = new ScriptedChatClient()
-            .CallTool("get_weather", new { city = "İzmir" }, callId: "call_izmir")
-            .Reply(req => $"İzmir'de hava {req.LastToolResult<string>()}");
-        AIAgent agent1 = CreateAgent(model1, db.CreateFactory(), weather);
-        AgentSession session1 = await agent1.CreateSessionAsync();
-        await agent1.RunAsync("İzmir'de hava nasıl?", session1);
-        JsonElement saved = await agent1.SerializeSessionAsync(session1);
-
-        var model2 = new ScriptedChatClient().Reply("Rica ederim.");
-        AIAgent agent2 = CreateAgent(model2, db.CreateFactory(), weather);
-        await agent2.RunAsync("Teşekkürler!", await agent2.DeserializeSessionAsync(saved));
-
-        RecordedRequest request = Assert.Single(model2.Requests);
-        FunctionCallContent call = Assert.Single(request.ToolCalls);
-        Assert.Equal(("call_izmir", "get_weather", "İzmir"), (call.CallId, call.Name, call.Arguments!["city"]?.ToString()));
-        FunctionResultContent result = Assert.Single(request.ToolResults);
-        Assert.Equal("call_izmir", result.CallId);
-        Assert.Equal("İzmir: 27C, güneşli", request.LastToolResult<string>());
-
-        using AgentStoreDbContext context = db.CreateContext();
-        string[] roles = await context.ChatMessages.OrderBy(m => m.Sequence).Select(m => m.Role).ToArrayAsync();
-        Assert.Equal(["user", "assistant", "tool", "assistant", "user", "assistant"], roles);
-    }
-
-    [Fact]
-    public async Task Concurrent_sessions_stay_isolated()
-    {
-        using var db = new TestDatabase();
-        string[] cities = ["İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Konya", "Adana", "Trabzon"];
-        const int Turns = 3;
-
-        var model = new ScriptedChatClient();
-        for (int i = 0; i < cities.Length * Turns; i++)
-        {
-            model.Reply(req => $"Cevap: {req.LastUserText}");
-        }
-
-        var provider = new EfChatHistoryProvider<AgentStoreDbContext>(db.CreateFactory());
-        AIAgent agent = model.AsAIAgent(new ChatClientAgentOptions { ChatHistoryProvider = provider });
-
-        AgentSession[] sessions = await Task.WhenAll(cities.Select(city => Task.Run(async () =>
-        {
-            AgentSession session = await agent.CreateSessionAsync();
-            for (int turn = 1; turn <= Turns; turn++)
-            {
-                await agent.RunAsync($"{city} {turn}", session);
-            }
-
-            return session;
-        })));
-
-        for (int i = 0; i < cities.Length; i++)
-        {
-            IReadOnlyList<ChatMessage> history = await provider.GetMessagesAsync(sessions[i]);
-            Assert.Equal(Turns * 2, history.Count);
-            Assert.All(history, m => Assert.Contains(cities[i] + " ", m.Text + " "));
-            Assert.Equal($"Cevap: {cities[i]} {Turns}", history[^1].Text);
-        }
-
-        Assert.Equal(cities.Length, sessions.Select(provider.GetConversationId).Distinct().Count());
-        model.ShouldBeExhausted();
-    }
-
-    [Fact]
-    public async Task Concurrent_appends_to_one_conversation_keep_every_message_once()
-    {
-        using var db = new TestDatabase();
-        AIAgent agent = new ScriptedChatClient().AsAIAgent();
-        AgentSession session = await agent.CreateSessionAsync();
-        var writers = new[]
-        {
-            new EfChatHistoryProvider<AgentStoreDbContext>(db.CreateFactory()),
-            new EfChatHistoryProvider<AgentStoreDbContext>(db.CreateFactory()),
-        };
-        string conversationId = writers[0].GetConversationId(session);   // both writers share the session state key
-
-        await Task.WhenAll(Enumerable.Range(1, 20).Select(n => Task.Run(() => writers[n % 2].InvokedAsync(
-            new ChatHistoryProvider.InvokedContext(agent, session,
-                [new ChatMessage(ChatRole.User, $"soru {n}")],
-                [new ChatMessage(ChatRole.Assistant, $"cevap {n}")])).AsTask())));
-
-        using AgentStoreDbContext context = db.CreateContext();
-        List<StoredChatMessage> rows = await context.ChatMessages.Where(m => m.ConversationId == conversationId).OrderBy(m => m.Sequence).ToListAsync();
-        Assert.Equal(Enumerable.Range(1, 40).Select(i => (long)i), rows.Select(r => r.Sequence));
-
-        IReadOnlyList<ChatMessage> history = await writers[0].GetMessagesAsync(session);
-        for (int n = 1; n <= 20; n++)
-        {
-            int question = history.ToList().FindIndex(m => m.Text == $"soru {n}");
-            Assert.Equal($"cevap {n}", history[question + 1].Text);   // each run's messages stay together and in order
-        }
-    }
-
-    [Fact]
     public async Task A_writer_that_loses_the_race_for_a_sequence_number_retries_after_the_winner()
     {
         using var db = new TestDatabase();
@@ -158,44 +74,6 @@ public sealed class ChatHistoryProviderTests
 
         Assert.Equal(1, intruder.Collisions);
         Assert.Equal(["Araya giren mesaj", "Merhaba", "Ankara'dan selamlar."], (await provider.GetMessagesAsync(session)).Select(m => m.Text));
-    }
-
-    [Fact]
-    public async Task Streaming_runs_are_stored_and_a_failed_run_stores_nothing()
-    {
-        using var db = new TestDatabase();
-        var model = new ScriptedChatClient()
-            .Reply("Ankara'da hava serin.")
-            .Fail(new HttpRequestException("429 Too Many Requests"));
-        var provider = new EfChatHistoryProvider<AgentStoreDbContext>(db.CreateFactory());
-        AIAgent agent = model.AsAIAgent(new ChatClientAgentOptions { ChatHistoryProvider = provider });
-        AgentSession session = await agent.CreateSessionAsync();
-
-        AgentResponse streamed = await agent.RunStreamingAsync("Ankara'da hava nasıl?", session).ToAgentResponseAsync();
-        await Assert.ThrowsAsync<HttpRequestException>(() => agent.RunAsync("Peki yarın?", session));
-
-        Assert.Equal("Ankara'da hava serin.", streamed.Text);
-        Assert.Equal(["Ankara'da hava nasıl?", "Ankara'da hava serin."], (await provider.GetMessagesAsync(session)).Select(m => m.Text));
-    }
-
-    [Fact]
-    public async Task Clear_deletes_only_that_sessions_history()
-    {
-        using var db = new TestDatabase();
-        var model = new ScriptedChatClient().Reply("Bir.").Reply("İki.").Reply(req => $"{req.Messages.Count}");
-        var provider = new EfChatHistoryProvider<AgentStoreDbContext>(db.CreateFactory());
-        AIAgent agent = model.AsAIAgent(new ChatClientAgentOptions { ChatHistoryProvider = provider });
-        AgentSession murat = await agent.CreateSessionAsync();
-        AgentSession ayse = await agent.CreateSessionAsync();
-        await agent.RunAsync("Merhaba", murat);
-        await agent.RunAsync("Selam", ayse);
-
-        int deleted = await provider.ClearAsync(murat);
-        AgentResponse afterClear = await agent.RunAsync("Yeniden merhaba", murat);
-
-        Assert.Equal(2, deleted);
-        Assert.Equal("1", afterClear.Text);                          // only the new message was sent
-        Assert.Equal(2, (await provider.GetMessagesAsync(ayse)).Count);
     }
 
     [Fact]
@@ -226,29 +104,20 @@ public sealed class ChatHistoryProviderTests
     }
 
     [Fact]
-    public async Task AddAgentStores_registers_both_stores_as_singletons()
+    public void AddAgentStores_registers_the_chat_history_provider_and_session_store_as_singletons()
     {
         using var db = new TestDatabase();
-        var services = new ServiceCollection()
+        using ServiceProvider sp = new ServiceCollection()
             .AddDbContextFactory<AgentStoreDbContext>(o => o.UseSqlite(db.ConnectionString))
-            .AddAgentStores<AgentStoreDbContext>(o => o.StateKey = "sohbet");
-        using ServiceProvider sp = services.BuildServiceProvider();
+            .AddAgentStores<AgentStoreDbContext>(o => o.ChatHistory.StateKey = "sohbet")
+            .BuildServiceProvider();
 
         var provider = sp.GetRequiredService<EfChatHistoryProvider<AgentStoreDbContext>>();
-        var store = sp.GetRequiredService<EfCheckpointStore<AgentStoreDbContext>>();
 
         Assert.Same(provider, sp.GetRequiredService<EfChatHistoryProvider<AgentStoreDbContext>>());
-        Assert.Same(store, sp.GetRequiredService<EfCheckpointStore<AgentStoreDbContext>>());
+        Assert.Same(sp.GetRequiredService<EfAgentSessionStore<AgentStoreDbContext>>(), sp.GetRequiredService<EfAgentSessionStore<AgentStoreDbContext>>());
         Assert.Equal(["sohbet"], provider.StateKeys);
     }
-
-    private static AIAgent CreateAgent(IChatClient model, IDbContextFactory<AgentStoreDbContext> factory, params AITool[] tools) =>
-        model.AsAIAgent(new ChatClientAgentOptions
-        {
-            Name = "assistant",
-            ChatOptions = new() { Tools = tools },
-            ChatHistoryProvider = new EfChatHistoryProvider<AgentStoreDbContext>(factory),
-        });
 
     /// <summary>Just before the first save, another writer takes the sequence number the save is about to use.</summary>
     private sealed class IntruderInterceptor(TestDatabase db) : SaveChangesInterceptor

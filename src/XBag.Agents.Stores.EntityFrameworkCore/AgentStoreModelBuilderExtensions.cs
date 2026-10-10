@@ -8,9 +8,10 @@ public static class AgentStoreModelBuilderExtensions
     internal const int IdMaxLength = 200;
 
     /// <summary>
-    /// Maps <see cref="StoredChatMessage"/> and <see cref="StoredCheckpoint"/> into the model. Call it from
+    /// Maps <see cref="StoredChatMessage"/> and <see cref="StoredAgentSession"/> into the model. Call it from
     /// <see cref="DbContext.OnModelCreating"/>; then create the tables with your usual migrations
-    /// (<c>dotnet ef migrations add AgentStores</c>) or <c>Database.EnsureCreated()</c>.
+    /// (<c>dotnet ef migrations add AgentStores</c>) or <c>Database.EnsureCreated()</c>. Workflow checkpoints live in the
+    /// separate package <c>XBag.Agents.Stores.EntityFrameworkCore.Workflows</c> (<c>MapAgentCheckpoints</c>).
     /// </summary>
     /// <param name="modelBuilder">The model builder of your context.</param>
     /// <param name="configure">Optional table and schema names.</param>
@@ -38,17 +39,18 @@ public static class AgentStoreModelBuilderExtensions
             entity.Property(m => m.Payload).HasColumnName("payload");
         });
 
-        modelBuilder.Entity<StoredCheckpoint>(entity =>
+        modelBuilder.Entity<StoredAgentSession>(entity =>
         {
-            entity.ToTable(options.CheckpointsTable, options.Schema);
-            entity.HasKey(c => new { c.SessionId, c.CheckpointId });
-            entity.HasIndex(c => new { c.SessionId, c.Sequence }).IsUnique();
-            entity.Property(c => c.SessionId).HasColumnName("session_id").HasMaxLength(IdMaxLength);
-            entity.Property(c => c.CheckpointId).HasColumnName("checkpoint_id").HasMaxLength(IdMaxLength);
-            entity.Property(c => c.Sequence).HasColumnName("sequence").ValueGeneratedNever();
-            entity.Property(c => c.ParentCheckpointId).HasColumnName("parent_checkpoint_id").HasMaxLength(IdMaxLength);
-            entity.Property(c => c.CreatedAt).HasColumnName("created_at");
-            entity.Property(c => c.Payload).HasColumnName("payload");
+            entity.ToTable(options.SessionsTable, options.Schema);
+            entity.HasKey(s => new { s.AgentNamespace, s.SessionKey });
+            entity.HasIndex(s => new { s.AgentNamespace, s.IsolationKey });
+            entity.Property(s => s.AgentNamespace).HasColumnName("agent_namespace").HasMaxLength(IdMaxLength);
+            entity.Property(s => s.SessionKey).HasColumnName("session_key").HasMaxLength(64).IsFixedLength();
+            entity.Property(s => s.SessionId).HasColumnName("session_id").HasMaxLength(IdMaxLength);
+            entity.Property(s => s.IsolationKey).HasColumnName("isolation_key").HasMaxLength(IdMaxLength);
+            entity.Property(s => s.Partitions).HasColumnName("partitions");
+            entity.Property(s => s.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(s => s.Payload).HasColumnName("payload");
         });
 
         return modelBuilder;

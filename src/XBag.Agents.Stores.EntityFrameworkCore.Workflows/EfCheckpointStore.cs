@@ -2,15 +2,15 @@ using System.Text.Json;
 using Microsoft.Agents.AI.Workflows;
 using Microsoft.Agents.AI.Workflows.Checkpointing;
 using Microsoft.EntityFrameworkCore;
-using XBag.Agents.Stores.EntityFrameworkCore.Internal;
+using XBag.Agents.Stores.Internal;
 
-namespace XBag.Agents.Stores.EntityFrameworkCore;
+namespace XBag.Agents.Stores.EntityFrameworkCore.Workflows;
 
 /// <summary>
 /// A <see cref="JsonCheckpointStore"/> that keeps Agent Framework workflow checkpoints in a relational database through
 /// Entity Framework Core. Plug it in with <c>CheckpointManager.CreateJson(store)</c>.
 /// </summary>
-/// <typeparam name="TContext">A context whose model contains the agent store tables (see <see cref="AgentStoreModelBuilderExtensions.MapAgentStores"/>).</typeparam>
+/// <typeparam name="TContext">A context whose model contains the agent store tables (see <see cref="AgentCheckpointModelBuilderExtensions.MapAgentCheckpoints"/>).</typeparam>
 /// <remarks>
 /// <para>
 /// Checkpoints are stored as JSON text exactly as the workflow produced them and listed in commit order (a per-session
@@ -120,9 +120,9 @@ public sealed class EfCheckpointStore<TContext> : JsonCheckpointStore
     private static void ValidateSessionId(string sessionId)
     {
         ArgumentException.ThrowIfNullOrEmpty(sessionId);
-        if (sessionId.Length > AgentStoreModelBuilderExtensions.IdMaxLength)
+        if (sessionId.Length > AgentCheckpointModelBuilderExtensions.IdMaxLength)
         {
-            throw new ArgumentException($"Session ids are limited to {AgentStoreModelBuilderExtensions.IdMaxLength} characters.", nameof(sessionId));
+            throw new ArgumentException($"Session ids are limited to {AgentCheckpointModelBuilderExtensions.IdMaxLength} characters.", nameof(sessionId));
         }
     }
 }
