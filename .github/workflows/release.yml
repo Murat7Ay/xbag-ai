@@ -1,0 +1,89 @@
+name: Release
+
+# Publishes packages to nuget.org with Trusted Publishing (GitHub OIDC -> short-lived NuGet API key; no stored secret).
+#
+# Two ways to release (each package has its own <Version> in its csproj):
+#   1. Actions > Release > Run workflow, package = "all" (every package under src/) or one project name,
+#      e.g. "XBag.AI.Testing". Versions already on nuget.org are skipped.
+#   2. Push a tag "<PackageId>/v<version>", e.g. "XBag.AI.Testing/v0.1.0-preview.2".
+#      The tag version must equal the csproj <Version>, otherwise the run fails before publishing.
+on:
+  workflow_dispatch:
+    inputs:
+      package:
+        description: 'Project name under src/ (e.g. XBag.AI.Testing), or "all"'
+        required: true
+        default: all
+  push:
+    tags: ['*/v*']
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write   # NuGet Trusted Publishing (OIDC)
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Select packages
+        id: select
+        shell: bash
+        env:
+          INPUT_PACKAGE: ${{ inputs.package }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            name="${GITHUB_REF_NAME%/v*}"
+            version="${GITHUB_REF_NAME##*/v}"
+            proj="src/$name/$name.csproj"
+            [[ -f "$proj" ]] || { echo "::error::Tag $GITHUB_REF_NAME does not name a project: $proj not found"; exit 1; }
+            actual="$(dotnet msbuild "$proj" -getProperty:Version)"
+            [[ "$actual" == "$version" ]] || { echo "::error::Tag version $version does not match <Version>$actual</Version> in $proj"; exit 1; }
+            projects="$proj"
+          elif [[ "$INPUT_PACKAGE" == "all" ]]; then
+            projects="$(ls src/*/*.csproj | tr '\n' ' ')"
+          else
+            proj="src/$INPUT_PACKAGE/$INPUT_PACKAGE.csproj"
+            [[ -f "$proj" ]] || { echo "::error::$proj not found"; exit 1; }
+            projects="$proj"
+          fi
+          echo "Publishing: $projects"
+          echo "projects=$projects" >> "$GITHUB_OUTPUT"
+
+      # Full test suite first (the Redis tests start a Redis container through Docker).
+      - run: dotnet test -c Release
+
+      - name: Pack
+        shell: bash
+        env:
+          PROJECTS: ${{ steps.select.outputs.projects }}
+        run: |
+          set -euo pipefail
+          for p in $PROJECTS; do
+            dotnet pack "$p" -c Release -o artifacts
+          done
+          ls -l artifacts
+
+      # Request the temporary key right before pushing: it is valid for one hour.
+      - name: NuGet login (OIDC -> temporary API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: MuratAy
+
+      - name: Push to nuget.org
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: released-packages
+          path: artifacts/*
