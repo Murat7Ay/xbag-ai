@@ -5,7 +5,7 @@
     <Version>0.1.0-preview.1</Version>
     <RootNamespace>XBag.AI.Quota</RootNamespace>
     <Title>XBag.AI.Quota</Title>
-    <Description>Rate limits for Microsoft.Extensions.AI: an IChatClient middleware that keeps every model call inside a tokens-per-minute, requests-per-minute and concurrency quota per model (reserve an estimate before the call, settle with the real UsageDetails after it), waits in a FIFO queue instead of flooding 429s, and retries 429 / transient failures honouring Retry-After without ever retrying a stream that already produced output. Provider-free; not affiliated with Microsoft.</Description>
+    <Description>Rate limits for Microsoft.Extensions.AI: an IChatClient middleware that keeps every model call inside a tokens-per-minute, requests-per-minute and concurrency quota per model (reserve an estimate before the call, settle with the real UsageDetails after it), waits in a FIFO queue instead of flooding 429s, and retries 429 / transient failures honouring Retry-After without ever retrying a stream that already produced output. Provider-free. Not affiliated with Microsoft.</Description>
     <PackageTags>ai;llm;rate-limiting;quota;tpm;rpm;retry-after;429;resilience;microsoft-extensions-ai</PackageTags>
   </PropertyGroup>
 
