@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.AI.Prompts.Agents</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.AI.Prompts.Agents</RootNamespace>
+    <Title>XBag.AI.Prompts.Agents</Title>
+    <Description>Microsoft Agent Framework glue for XBag.AI.Prompts: PromptInstructionsProvider, an AIContextProvider that renders a prompt template into the agent's instructions on every run, with per-run variables from the run options or the session. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;llm;prompt;prompt-template;instructions;agents;agent-framework;aicontextprovider;microsoft-extensions-ai</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XBag.AI.Prompts\XBag.AI.Prompts.csproj" />
+    <!-- Only the abstractions: AIContextProvider, AIContext and AIAgent.CurrentRunContext live there. -->
+    <PackageReference Include="Microsoft.Agents.AI.Abstractions" Version="1.24.0" />
+  </ItemGroup>
+
+</Project>

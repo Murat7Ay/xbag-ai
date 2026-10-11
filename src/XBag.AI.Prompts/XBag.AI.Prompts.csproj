@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.AI.Prompts</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.AI.Prompts</RootNamespace>
+    <Title>XBag.AI.Prompts</Title>
+    <Description>Prompt templates for Microsoft.Extensions.AI without Semantic Kernel: a small Handlebars-style engine (variables, if, each, comments, SK-style {{$var}}) that renders instructions or role-structured ChatMessage lists. Variable values are escaped by default and can never open or close a message block. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;llm;prompt;prompt-template;handlebars;prompt-injection;ichatclient;microsoft-extensions-ai;agent-framework</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="System.Globalization" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Only the abstractions: ChatMessage and ChatRole. The engine has no third-party dependency. -->
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.10.1" />
+  </ItemGroup>
+
+</Project>
