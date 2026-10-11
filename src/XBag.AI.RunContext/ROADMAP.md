@@ -2,7 +2,7 @@
 
 `0.1.0-preview.1` ships `RunContext<T>` (options-carried or ambient scope), `WithRunContext` for `ChatOptions`,
 `BindRunContext<T>()`, `WithServiceScope()` and `RunContextBearerHandler<T>` with an origin allow-list. The agent glue is in
-[XBag.Agents.RunContext](https://github.com/Murat7Ay/xbag-ai/blob/main/src/XBag.Agents.RunContext/ROADMAP.md). The items below are deliberately **out of
+[XBag.AI.RunContext.Agents](https://github.com/Murat7Ay/xbag-ai/blob/main/src/XBag.AI.RunContext.Agents/ROADMAP.md). The items below are deliberately **out of
 this iteration**:
 
 - **Token providers.** An `IRunTokenProvider<T>` with ready implementations: forwarded user JWT, static key, and MSAL / Entra

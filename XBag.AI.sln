@@ -59,7 +59,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBag.AI.ToolSelection.Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBag.AI.RunContext", "src\XBag.AI.RunContext\XBag.AI.RunContext.csproj", "{730EA75D-83BE-46B1-B51F-64B7AE623CA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBag.Agents.RunContext", "src\XBag.Agents.RunContext\XBag.Agents.RunContext.csproj", "{BE3CA3D1-B726-4A49-B839-8C7B2C1D4EEB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBag.AI.RunContext.Agents", "src\XBag.AI.RunContext.Agents\XBag.AI.RunContext.Agents.csproj", "{BE3CA3D1-B726-4A49-B839-8C7B2C1D4EEB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XBag.AI.RunContext.Tests", "tests\XBag.AI.RunContext.Tests\XBag.AI.RunContext.Tests.csproj", "{CBC78526-2BE4-4866-BBD5-869CDDA2C733}"
 EndProject

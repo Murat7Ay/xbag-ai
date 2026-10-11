@@ -1,7 +1,7 @@
-# XBag.Agents.RunContext
+# XBag.AI.RunContext.Agents
 
 [![CI](https://github.com/Murat7Ay/xbag-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/Murat7Ay/xbag-ai/actions/workflows/ci.yml)
-[![NuGet](https://img.shields.io/nuget/vpre/XBag.Agents.RunContext.svg)](https://www.nuget.org/packages/XBag.Agents.RunContext)
+[![NuGet](https://img.shields.io/nuget/vpre/XBag.AI.RunContext.Agents.svg)](https://www.nuget.org/packages/XBag.AI.RunContext.Agents)
 [![.NET 8 | 10](https://img.shields.io/badge/.NET-8%20%7C%2010-512BD4)](https://dotnet.microsoft.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Murat7Ay/xbag-ai/blob/main/LICENSE)
 
@@ -22,7 +22,7 @@ Pipeline slot: agent layer, AIAgentBuilder.UseRunContext<T>() (DelegatingAIAgent
 ## Install
 
 ```bash
-dotnet add package XBag.Agents.RunContext --prerelease
+dotnet add package XBag.AI.RunContext.Agents --prerelease
 ```
 
 ## Example
@@ -82,7 +82,7 @@ Proven in [`AgentTests.cs`](https://github.com/Murat7Ay/xbag-ai/blob/main/tests/
 ## What this is not
 
 - **No ASP.NET Core registration** (`services.AddRunContext<T>(http => ...)`) yet: use a resolver with `IHttpContextAccessor`.
-  See the [roadmap](https://github.com/Murat7Ay/xbag-ai/blob/main/src/XBag.Agents.RunContext/ROADMAP.md).
+  See the [roadmap](https://github.com/Murat7Ay/xbag-ai/blob/main/src/XBag.AI.RunContext.Agents/ROADMAP.md).
 - **No flow into durable work**: a workflow resumed from a checkpoint or a background response polled later starts without it.
 
 ## If Microsoft ships a typed run context

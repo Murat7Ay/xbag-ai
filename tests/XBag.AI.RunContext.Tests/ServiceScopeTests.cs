@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.DependencyInjection;
-using XBag.Agents.RunContext;
+using XBag.AI.RunContext.Agents;
 
 namespace XBag.AI.RunContext.Tests;
 

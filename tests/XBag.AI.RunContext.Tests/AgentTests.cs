@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 using Microsoft.Agents.AI;
-using XBag.Agents.RunContext;
+using XBag.AI.RunContext.Agents;
 
 namespace XBag.AI.RunContext.Tests;
 

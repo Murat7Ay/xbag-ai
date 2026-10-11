@@ -1,7 +1,7 @@
 using Microsoft.Agents.AI;
 using XBag.AI.RunContext;
 
-namespace XBag.Agents.RunContext;
+namespace XBag.AI.RunContext.Agents;
 
 /// <summary>Run-context helpers for Microsoft Agent Framework agents.</summary>
 public static class RunContextAgentExtensions

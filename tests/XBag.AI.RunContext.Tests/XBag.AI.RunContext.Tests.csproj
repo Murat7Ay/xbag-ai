@@ -18,7 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\XBag.AI.RunContext\XBag.AI.RunContext.csproj" />
-    <ProjectReference Include="..\..\src\XBag.Agents.RunContext\XBag.Agents.RunContext.csproj" />
+    <ProjectReference Include="..\..\src\XBag.AI.RunContext.Agents\XBag.AI.RunContext.Agents.csproj" />
     <ProjectReference Include="..\..\src\XBag.AI.Testing\XBag.AI.Testing.csproj" />
   </ItemGroup>
 

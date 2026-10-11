@@ -14,7 +14,7 @@ namespace XBag.AI.RunContext;
 /// <list type="number">
 /// <item><description>
 /// <b>Carried by the request options</b>: <c>ChatOptions.WithRunContext(value)</c>, or <c>AgentRunOptions.WithRunContext(value)</c> from
-/// XBag.Agents.RunContext (<c>ChatClientAgent</c> copies run options into the chat options of every model call). It is read from
+/// XBag.AI.RunContext.Agents (<c>ChatClientAgent</c> copies run options into the chat options of every model call). It is read from
 /// <see cref="FunctionInvokingChatClient.CurrentContext"/>, so it is visible while a tool runs.
 /// </description></item>
 /// <item><description>

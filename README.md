@@ -29,7 +29,7 @@ extension point and is useful on its own. Community packages, not affiliated wit
 | [`XBag.AI.Quota.ClientModel`](src/XBag.AI.Quota.ClientModel) | 429 / 5xx and `Retry-After` from the OpenAI and Azure OpenAI SDKs (`ClientResultException`) for `XBag.AI.Quota` | 0.1.0-preview.1 |
 | [`XBag.AI.ToolSelection`](src/XBag.AI.ToolSelection) | Send only the relevant tools per model call (BM25, embeddings or both), plus `search_tools` / `unload_tools` for large catalogs | 0.1.0-preview.1 |
 | [`XBag.AI.RunContext`](src/XBag.AI.RunContext) | Typed per-request context (user, tenant, token) for tools: hidden tool parameters the model cannot fill, a DI scope per tool call, a bearer-token handler for allowed origins | 0.1.0-preview.1 |
-| [`XBag.Agents.RunContext`](src/XBag.Agents.RunContext) | `AgentRunOptions.WithRunContext`, `AIAgentBuilder.UseRunContext<T>()`: the same context for every agent run, streaming included | 0.1.0-preview.1 |
+| [`XBag.AI.RunContext.Agents`](src/XBag.AI.RunContext.Agents) | `AgentRunOptions.WithRunContext`, `AIAgentBuilder.UseRunContext<T>()`: the same context for every agent run, streaming included | 0.1.0-preview.1 |
 | `XBag.AI.ToolGuard` | Tool-argument validation with corrective feedback, result caps | planned |
 | `XBag.AI.Adaptive` | Option and structured-output adaptation across models (Qwen, vLLM, OpenAI-compatible endpoints) | planned |
 
@@ -56,7 +56,7 @@ calling for models without native tool calls.
 | `XBag.AI.Prompts`, `XBag.AI.Prompts.Agents` | Yes (analyzers clean) | Own template engine, no third-party dependency; `PromptArguments.From<T>` reads properties with trim annotations |
 | `XBag.AI.Quota`, `XBag.AI.Quota.ClientModel` | Yes (analyzers clean) | Only Microsoft.Extensions.AI and System.ClientModel; our code uses no reflection |
 | `XBag.AI.ToolSelection` | Yes (analyzers clean) | Only Microsoft.Extensions.AI; the `search_tools` / `unload_tools` functions build their JSON schema and results by hand, without reflection |
-| `XBag.AI.RunContext`, `XBag.Agents.RunContext` | Yes (analyzers clean) | Only Microsoft.Extensions.AI and Microsoft.Agents.AI; parameter binding goes through `AIFunctionFactoryOptions.ConfigureParameterBinding`, no reflection of our own |
+| `XBag.AI.RunContext`, `XBag.AI.RunContext.Agents` | Yes (analyzers clean) | Only Microsoft.Extensions.AI and Microsoft.Agents.AI; parameter binding goes through `AIFunctionFactoryOptions.ConfigureParameterBinding`, no reflection of our own |
 | `XBag.Agents.Stores.EntityFrameworkCore`, `.EntityFrameworkCore.Workflows` | No | EF Core does not support trimming or NativeAOT, so these packages do not claim it |
 | `XBag.Agents.Stores.Redis`, `.Redis.Workflows` | Not verified | Our code passes the trim/AOT analyzers, but StackExchange.Redis is not annotated as trimmable and no NativeAOT publish was tested |
 

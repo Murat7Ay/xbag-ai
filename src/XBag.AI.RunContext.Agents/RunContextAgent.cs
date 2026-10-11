@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using Microsoft.Agents.AI;
 using XBag.AI.RunContext;
 
-namespace XBag.Agents.RunContext;
+namespace XBag.AI.RunContext.Agents;
 
 /// <summary>
 /// An agent decorator that makes a run's context the ambient <see cref="RunContext{T}"/> for the whole run: tools, context

@@ -4,7 +4,7 @@
 `RunContextAgent<T>`. The shared roadmap is in [XBag.AI.RunContext/ROADMAP.md](https://github.com/Murat7Ay/xbag-ai/blob/main/src/XBag.AI.RunContext/ROADMAP.md). Items that
 belong to this package:
 
-- **ASP.NET Core registration** in a preview-quarantined `XBag.Agents.RunContext.AspNetCore` sub-package:
+- **ASP.NET Core registration** in a preview-quarantined `XBag.AI.RunContext.Agents.AspNetCore` sub-package:
   `services.AddRunContext<T>(http => ...)` plus automatic decoration of agents served by `MapAGUI` / `MapA2A` / Responses, which
   build their own run options.
 - **Background runs**: carry the context into `AllowBackgroundResponses` runs and continuation-token polling.

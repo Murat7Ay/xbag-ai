@@ -14,7 +14,7 @@ bearer token (for MCP and internal APIs, allowed origins only) come with it.
 | Package | Contains |
 |---|---|
 | `XBag.AI.RunContext` (this one) | `RunContext<T>`, `WithRunContext` for `ChatOptions`, `BindRunContext<T>()`, `WithServiceScope()`, `RunContextBearerHandler<T>`; depends on Microsoft.Extensions.AI |
-| [`XBag.Agents.RunContext`](https://github.com/Murat7Ay/xbag-ai/tree/main/src/XBag.Agents.RunContext) | Microsoft Agent Framework glue: `AgentRunOptions.WithRunContext`, `AIAgentBuilder.UseRunContext<T>()` |
+| [`XBag.AI.RunContext.Agents`](https://github.com/Murat7Ay/xbag-ai/tree/main/src/XBag.AI.RunContext.Agents) | Microsoft Agent Framework glue: `AgentRunOptions.WithRunContext`, `AIAgentBuilder.UseRunContext<T>()` |
 
 > Part of the **XBag** family of .NET packages by Murat Ay, the author of XBag, a .NET process-orchestration and
 > decisioning platform. Community package, not affiliated with Microsoft.

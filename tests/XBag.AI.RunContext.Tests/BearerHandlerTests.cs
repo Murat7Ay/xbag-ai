@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net;
 using Microsoft.Agents.AI;
-using XBag.Agents.RunContext;
+using XBag.AI.RunContext.Agents;
 
 namespace XBag.AI.RunContext.Tests;
 

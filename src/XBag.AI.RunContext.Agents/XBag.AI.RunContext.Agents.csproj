@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>XBag.Agents.RunContext</PackageId>
+    <PackageId>XBag.AI.RunContext.Agents</PackageId>
     <Version>0.1.0-preview.1</Version>
-    <RootNamespace>XBag.Agents.RunContext</RootNamespace>
-    <Title>XBag.Agents.RunContext</Title>
+    <RootNamespace>XBag.AI.RunContext.Agents</RootNamespace>
+    <Title>XBag.AI.RunContext.Agents</Title>
     <Description>Microsoft Agent Framework glue for XBag.AI.RunContext: AgentRunOptions.WithRunContext and AIAgentBuilder.UseRunContext give every agent run a typed user / tenant / credential context that its tools, context providers, sub-agents and HTTP/MCP calls can read, buffered and streaming. Not affiliated with Microsoft.</Description>
     <PackageTags>ai;llm;agents;agent-framework;tools;identity;multi-tenant;on-behalf-of;mcp;microsoft-extensions-ai</PackageTags>
   </PropertyGroup>
