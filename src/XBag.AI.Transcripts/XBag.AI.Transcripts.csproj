@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.AI.Transcripts</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.AI.Transcripts</RootNamespace>
+    <Title>XBag.AI.Transcripts</Title>
+    <Description>Validate and repair stored conversations for Microsoft.Extensions.AI before they are sent again: tool calls without results (a crash or a cancelled stream between call and result), results without calls, results that drifted away from their call, duplicate call ids, approval requests that were never answered (FunctionInvokingChatClient throws on those) and approval responses without a request. Clear findings, opt-in repair policies that never touch the caller's list, and a UseTranscriptGuard() middleware that goes above FunctionInvokingChatClient, also inside Agent Framework's ChatClientAgent. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;llm;chat-history;transcript;tool-calls;function-calling;approvals;validation;repair;microsoft-extensions-ai;agent-framework</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Microsoft.Extensions.AI (not only the abstractions) for ChatClientBuilder, which UseTranscriptGuard extends.
+         Logging and DI abstractions come with it. -->
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.10.0" />
+  </ItemGroup>
+
+</Project>
