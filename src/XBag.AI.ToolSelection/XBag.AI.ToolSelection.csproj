@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.AI.ToolSelection</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.AI.ToolSelection</RootNamespace>
+    <Title>XBag.AI.ToolSelection</Title>
+    <Description>Send only the relevant tools per model call for Microsoft.Extensions.AI: an IChatClient middleware below FunctionInvokingChatClient that ranks ChatOptions.Tools per request (BM25 keywords, embeddings, or both), keeps always-on tools and every tool already called in the conversation, and sends the top K on a cloned ChatOptions, so the tool loop still resolves every tool. Adds search_tools / unload_tools for progressive tool exposure on any provider. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;llm;tools;function-calling;tool-selection;tool-search;bm25;embeddings;mcp;microsoft-extensions-ai</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Microsoft.Extensions.AI (not only the abstractions): ChatClientBuilder, FunctionInvokingChatClient.CurrentContext for
+         search_tools, and System.Numerics.Tensors (TensorPrimitives.CosineSimilarity), which it already depends on. -->
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.10.0" />
+  </ItemGroup>
+
+</Project>

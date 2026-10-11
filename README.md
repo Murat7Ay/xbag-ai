@@ -27,6 +27,7 @@ extension point and is useful on its own. Community packages, not affiliated wit
 | [`XBag.AI.Prompts.Agents`](src/XBag.AI.Prompts.Agents) | `PromptInstructionsProvider`: renders a template into an agent's instructions on every run | 0.1.0-preview.1 |
 | [`XBag.AI.Quota`](src/XBag.AI.Quota) | Tokens-per-minute, requests-per-minute and concurrency limits per model, a FIFO queue instead of 429s, `Retry-After`-aware retry that never retries a started stream | 0.1.0-preview.1 |
 | [`XBag.AI.Quota.ClientModel`](src/XBag.AI.Quota.ClientModel) | 429 / 5xx and `Retry-After` from the OpenAI and Azure OpenAI SDKs (`ClientResultException`) for `XBag.AI.Quota` | 0.1.0-preview.1 |
+| [`XBag.AI.ToolSelection`](src/XBag.AI.ToolSelection) | Send only the relevant tools per model call (BM25, embeddings or both), plus `search_tools` / `unload_tools` for large catalogs | 0.1.0-preview.1 |
 | `XBag.AI.ToolGuard` | Tool-argument validation with corrective feedback, result caps | planned |
 | `XBag.AI.Adaptive` | Option and structured-output adaptation across models (Qwen, vLLM, OpenAI-compatible endpoints) | planned |
 
@@ -52,6 +53,7 @@ calling for models without native tool calls.
 | `XBag.AI.Analyzers` | Not applicable | Runs inside the compiler at build time; nothing is deployed with your app |
 | `XBag.AI.Prompts`, `XBag.AI.Prompts.Agents` | Yes (analyzers clean) | Own template engine, no third-party dependency; `PromptArguments.From<T>` reads properties with trim annotations |
 | `XBag.AI.Quota`, `XBag.AI.Quota.ClientModel` | Yes (analyzers clean) | Only Microsoft.Extensions.AI and System.ClientModel; our code uses no reflection |
+| `XBag.AI.ToolSelection` | Yes (analyzers clean) | Only Microsoft.Extensions.AI; the `search_tools` / `unload_tools` functions build their JSON schema and results by hand, without reflection |
 | `XBag.Agents.Stores.EntityFrameworkCore`, `.EntityFrameworkCore.Workflows` | No | EF Core does not support trimming or NativeAOT, so these packages do not claim it |
 | `XBag.Agents.Stores.Redis`, `.Redis.Workflows` | Not verified | Our code passes the trim/AOT analyzers, but StackExchange.Redis is not annotated as trimmable and no NativeAOT publish was tested |
 
