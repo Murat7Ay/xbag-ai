@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.AI.Quota.ClientModel</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.AI.Quota.ClientModel</RootNamespace>
+    <Title>XBag.AI.Quota.ClientModel</Title>
+    <Description>Retry-After for XBag.AI.Quota with the OpenAI and Azure OpenAI SDKs: classifies System.ClientModel's ClientResultException (429 rate limited, 408/5xx transient, everything else not retryable) and reads retry-after-ms, x-ms-retry-after-ms and Retry-After from the raw response. Not affiliated with Microsoft or OpenAI.</Description>
+    <PackageTags>ai;llm;rate-limiting;quota;retry-after;429;openai;azure-openai;system-clientmodel;microsoft-extensions-ai</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XBag.AI.Quota\XBag.AI.Quota.csproj" />
+    <!-- 1.15.0 is the version the OpenAI 2.14.0 SDK (used by Microsoft.Extensions.AI.OpenAI 10.10.x) depends on: the floor. -->
+    <PackageReference Include="System.ClientModel" Version="1.15.0" />
+  </ItemGroup>
+
+</Project>

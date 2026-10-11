@@ -25,6 +25,8 @@ extension point and is useful on its own. Community packages, not affiliated wit
 | [`XBag.AI.Analyzers`](src/XBag.AI.Analyzers) | Roslyn analyzers and code fixes for Microsoft.Extensions.AI / Agent Framework footguns that compile and fail silently (XBAG001-006) | 0.1.0-preview.1 |
 | [`XBag.AI.Prompts`](src/XBag.AI.Prompts) | Prompt templates without Semantic Kernel: variables, `if`, `each`, role-structured messages; values escaped and never able to open a message | 0.1.0-preview.1 |
 | [`XBag.AI.Prompts.Agents`](src/XBag.AI.Prompts.Agents) | `PromptInstructionsProvider`: renders a template into an agent's instructions on every run | 0.1.0-preview.1 |
+| [`XBag.AI.Quota`](src/XBag.AI.Quota) | Tokens-per-minute, requests-per-minute and concurrency limits per model, a FIFO queue instead of 429s, `Retry-After`-aware retry that never retries a started stream | 0.1.0-preview.1 |
+| [`XBag.AI.Quota.ClientModel`](src/XBag.AI.Quota.ClientModel) | 429 / 5xx and `Retry-After` from the OpenAI and Azure OpenAI SDKs (`ClientResultException`) for `XBag.AI.Quota` | 0.1.0-preview.1 |
 | `XBag.AI.ToolGuard` | Tool-argument validation with corrective feedback, result caps | planned |
 | `XBag.AI.Adaptive` | Option and structured-output adaptation across models (Qwen, vLLM, OpenAI-compatible endpoints) | planned |
 
@@ -49,6 +51,7 @@ calling for models without native tool calls.
 | `XBag.AI.Transcripts` | Yes (analyzers clean) | Only Microsoft.Extensions.AI; our code uses no reflection |
 | `XBag.AI.Analyzers` | Not applicable | Runs inside the compiler at build time; nothing is deployed with your app |
 | `XBag.AI.Prompts`, `XBag.AI.Prompts.Agents` | Yes (analyzers clean) | Own template engine, no third-party dependency; `PromptArguments.From<T>` reads properties with trim annotations |
+| `XBag.AI.Quota`, `XBag.AI.Quota.ClientModel` | Yes (analyzers clean) | Only Microsoft.Extensions.AI and System.ClientModel; our code uses no reflection |
 | `XBag.Agents.Stores.EntityFrameworkCore`, `.EntityFrameworkCore.Workflows` | No | EF Core does not support trimming or NativeAOT, so these packages do not claim it |
 | `XBag.Agents.Stores.Redis`, `.Redis.Workflows` | Not verified | Our code passes the trim/AOT analyzers, but StackExchange.Redis is not annotated as trimmable and no NativeAOT publish was tested |
 
