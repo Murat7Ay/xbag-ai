@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>XBag.AI.RunContext</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.AI.RunContext</RootNamespace>
+    <Title>XBag.AI.RunContext</Title>
+    <Description>Typed per-request context (user, tenant, credentials) for Microsoft.Extensions.AI tools: RunContext&lt;T&gt; flows a value from the request to every tool call, binds it as a hidden tool parameter the model cannot fill, opens a DI scope per tool call, and stamps the current user's bearer token on HTTP and MCP calls to allowed origins only. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;llm;tools;function-calling;identity;multi-tenant;on-behalf-of;bearer-token;mcp;asynclocal;microsoft-extensions-ai</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Microsoft.Extensions.AI (not only the abstractions): RunContext<T> reads FunctionInvokingChatClient.CurrentContext. -->
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.10.0" />
+  </ItemGroup>
+
+</Project>

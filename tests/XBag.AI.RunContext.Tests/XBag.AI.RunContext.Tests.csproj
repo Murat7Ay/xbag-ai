@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" />
+    <!-- The real Microsoft pipeline the context is proven against, plus a real DI container for the scope tests. -->
+    <PackageReference Include="Microsoft.Extensions.AI" Version="10.10.0" />
+    <PackageReference Include="Microsoft.Agents.AI" Version="1.24.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\XBag.AI.RunContext\XBag.AI.RunContext.csproj" />
+    <ProjectReference Include="..\..\src\XBag.Agents.RunContext\XBag.Agents.RunContext.csproj" />
+    <ProjectReference Include="..\..\src\XBag.AI.Testing\XBag.AI.Testing.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="Microsoft.Extensions.AI" />
+    <Using Include="XBag.AI.Testing" />
+    <Using Include="XBag.AI.RunContext" />
+  </ItemGroup>
+
+</Project>
