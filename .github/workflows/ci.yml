@@ -19,6 +19,14 @@ jobs:
       - run: dotnet build --no-restore -c Release
       - run: dotnet test --no-build -c Release --verbosity normal
       - run: dotnet pack --no-build -c Release -o artifacts
+      # XBag.AI.Analyzers packs its two dlls by hand (analyzers/dotnet/cs, no lib/); a broken target would ship an empty package.
+      - name: Analyzer package layout
+        run: |
+          unzip -l artifacts/XBag.AI.Analyzers.*.nupkg | tee layout.txt
+          grep -q "analyzers/dotnet/cs/XBag.AI.Analyzers.dll" layout.txt
+          grep -q "analyzers/dotnet/cs/XBag.AI.Analyzers.CodeFixes.dll" layout.txt
+          if grep -q " lib/" layout.txt; then echo "::error::lib/ folder in the analyzer package"; exit 1; fi
+          if ls artifacts/XBag.AI.Analyzers.CodeFixes.*.nupkg 2>/dev/null; then echo "::error::CodeFixes must not be its own package"; exit 1; fi
       # The Redis packages are built against StackExchange.Redis 2.13 (floor); the run above tests them on 3.x.
       - run: dotnet test tests/XBag.Agents.Stores.Redis.Tests -c Release -p:TestRedisClientVersion=2.13.17
       - uses: actions/upload-artifact@v4

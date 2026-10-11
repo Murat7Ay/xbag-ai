@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- A Roslyn analyzer runs inside the compiler (csc on .NET 8 / .NET 10 SDKs, Visual Studio, Rider): netstandard2.0 only.
+         src/Directory.Build.props sets net8.0;net10.0 and AOT for runtime packages; both are overridden here. -->
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <IsAotCompatible>false</IsAotCompatible>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsRoslynComponent>true</IsRoslynComponent>
+
+    <PackageId>XBag.AI.Analyzers</PackageId>
+    <Version>0.1.0-preview.1</Version>
+    <RootNamespace>XBag.AI.Analyzers</RootNamespace>
+    <Title>XBag.AI.Analyzers</Title>
+    <Description>Roslyn analyzers and code fixes for Microsoft.Extensions.AI and Microsoft Agent Framework footguns that compile fine and fail silently: UseOpenTelemetry outside UseFunctionInvocation (no tool spans), GetService returning this for every type, middleware that overrides only the buffered or only the streaming path, middleware that mutates the caller's ChatOptions, agents without a stable id in workflow code, and agent middleware that replaces AgentResponse.Messages (lost under OpenTelemetry). No runtime dependency. Not affiliated with Microsoft.</Description>
+    <PackageTags>ai;llm;roslyn;analyzers;code-fix;microsoft-extensions-ai;agent-framework</PackageTags>
+
+    <!-- Analyzer package shape: no lib/ folder, no dependencies, development-only (PrivateAssets=all for consumers). -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <IncludeSymbols>false</IncludeSymbols>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_XBagAddAnalyzerAssemblies</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The runtime packages get a global `using Microsoft.Extensions.AI;` from src/Directory.Build.props; this project has no such reference. -->
+    <Using Remove="Microsoft.Extensions.AI" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 4.8.0 = the Roslyn of the first .NET 8 SDK (8.0.100, VS 17.8): the analyzer loads on every .NET 8 and .NET 10 SDK. -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.md" />
+    <AdditionalFiles Include="AnalyzerReleases.Unshipped.md" />
+  </ItemGroup>
+
+  <!-- Both assemblies go to analyzers/dotnet/cs. The code fixes live in their own assembly because they need
+       Microsoft.CodeAnalysis.Workspaces, which the command-line compiler does not load (RS1038). -->
+  <Target Name="_XBagAddAnalyzerAssemblies">
+    <PropertyGroup>
+      <!-- Pack with NoBuild (CI) only asks for the already-built path; a plain pack builds the fixes first. -->
+      <_XBagCodeFixesTarget Condition="'$(NoBuild)' == 'true'">GetTargetPath</_XBagCodeFixesTarget>
+      <_XBagCodeFixesTarget Condition="'$(NoBuild)' != 'true'">Build</_XBagCodeFixesTarget>
+    </PropertyGroup>
+    <MSBuild Projects="..\XBag.AI.Analyzers.CodeFixes\XBag.AI.Analyzers.CodeFixes.csproj" Targets="$(_XBagCodeFixesTarget)" Properties="Configuration=$(Configuration);TargetFramework=netstandard2.0">
+      <Output TaskParameter="TargetOutputs" ItemName="_XBagCodeFixesAssembly" />
+    </MSBuild>
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="analyzers/dotnet/cs" />
+      <TfmSpecificPackageFile Include="@(_XBagCodeFixesAssembly)" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
+
+</Project>

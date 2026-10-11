@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Code fixes for XBag.AI.Analyzers. Not a package of its own: XBag.AI.Analyzers packs this assembly next to the analyzers. -->
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <IsAotCompatible>false</IsAotCompatible>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>XBag.AI.Analyzers</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Remove="Microsoft.Extensions.AI" />
+    <None Remove="$(MSBuildProjectDirectory)/README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XBag.AI.Analyzers\XBag.AI.Analyzers.csproj" />
+  </ItemGroup>
+
+</Project>
